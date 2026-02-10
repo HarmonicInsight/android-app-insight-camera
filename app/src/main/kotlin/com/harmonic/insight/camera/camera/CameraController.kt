@@ -278,20 +278,25 @@ class InsightCameraController(private val context: Context) {
             // Fallback: try binding without extensions
             Log.w(TAG, "Bind failed, retrying without extensions", e)
             activeExtensionMode = ExtensionMode.NONE
-            if (captureMode == CaptureMode.PHOTO) {
-                provider.bindToLifecycle(
-                    lifecycleOwner,
-                    baseCameraSelector,
-                    preview,
-                    imageCapture,
-                )
-            } else {
-                provider.bindToLifecycle(
-                    lifecycleOwner,
-                    baseCameraSelector,
-                    preview,
-                    videoCapture,
-                )
+            try {
+                if (captureMode == CaptureMode.PHOTO) {
+                    provider.bindToLifecycle(
+                        lifecycleOwner,
+                        baseCameraSelector,
+                        preview,
+                        imageCapture,
+                    )
+                } else {
+                    provider.bindToLifecycle(
+                        lifecycleOwner,
+                        baseCameraSelector,
+                        preview,
+                        videoCapture,
+                    )
+                }
+            } catch (e2: Exception) {
+                Log.e(TAG, "Camera bind completely failed", e2)
+                null
             }
         }
 
@@ -304,22 +309,30 @@ class InsightCameraController(private val context: Context) {
     private fun rebind() {
         val lo = currentLifecycleOwner ?: return
         val pv = currentPreviewView ?: return
-        bindCameraUseCases(lo, pv)
+        try {
+            bindCameraUseCases(lo, pv)
+        } catch (e: Exception) {
+            Log.e(TAG, "Rebind failed", e)
+        }
     }
 
     // --- Focus ---
 
     fun focusOnPoint(x: Float, y: Float, viewWidth: Int, viewHeight: Int) {
         val cam = camera ?: return
-        val factory = SurfaceOrientedMeteringPointFactory(
-            viewWidth.toFloat(),
-            viewHeight.toFloat(),
-        )
-        val point = factory.createPoint(x, y)
-        val action = FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF or FocusMeteringAction.FLAG_AE)
-            .setAutoCancelDuration(3, TimeUnit.SECONDS)
-            .build()
-        cam.cameraControl.startFocusAndMetering(action)
+        try {
+            val factory = SurfaceOrientedMeteringPointFactory(
+                viewWidth.toFloat(),
+                viewHeight.toFloat(),
+            )
+            val point = factory.createPoint(x, y)
+            val action = FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF or FocusMeteringAction.FLAG_AE)
+                .setAutoCancelDuration(3, TimeUnit.SECONDS)
+                .build()
+            cam.cameraControl.startFocusAndMetering(action)
+        } catch (e: Exception) {
+            Log.w(TAG, "Focus failed", e)
+        }
     }
 
     // --- Photo ---
@@ -369,6 +382,7 @@ class InsightCameraController(private val context: Context) {
 
     // --- Video ---
 
+    @android.annotation.SuppressLint("MissingPermission")
     @androidx.annotation.OptIn(androidx.camera.video.ExperimentalPersistentRecording::class)
     fun startVideoRecording(
         withAudio: Boolean,
@@ -395,29 +409,34 @@ class InsightCameraController(private val context: Context) {
             MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
         ).setContentValues(contentValues).build()
 
-        var pendingRecording = vc.output.prepareRecording(context, outputOptions)
-        if (withAudio) {
-            pendingRecording = pendingRecording.withAudioEnabled()
-        }
+        try {
+            var pendingRecording = vc.output.prepareRecording(context, outputOptions)
+            if (withAudio) {
+                pendingRecording = pendingRecording.withAudioEnabled()
+            }
 
-        activeRecording = pendingRecording.start(ContextCompat.getMainExecutor(context)) { event ->
-            when (event) {
-                is VideoRecordEvent.Start -> {
-                    isRecording = true
-                    onStarted()
-                }
-                is VideoRecordEvent.Finalize -> {
-                    isRecording = false
-                    if (event.hasError()) {
-                        Log.e(TAG, "Video recording error: ${event.cause?.message}")
-                        onError(event.cause?.message ?: "Unknown error")
-                    } else {
-                        val uri = event.outputResults.outputUri.toString()
-                        Log.d(TAG, "Video saved: $uri")
-                        onFinished(uri)
+            activeRecording = pendingRecording.start(ContextCompat.getMainExecutor(context)) { event ->
+                when (event) {
+                    is VideoRecordEvent.Start -> {
+                        isRecording = true
+                        onStarted()
+                    }
+                    is VideoRecordEvent.Finalize -> {
+                        isRecording = false
+                        if (event.hasError()) {
+                            Log.e(TAG, "Video recording error: ${event.cause?.message}")
+                            onError(event.cause?.message ?: "Unknown error")
+                        } else {
+                            val uri = event.outputResults.outputUri.toString()
+                            Log.d(TAG, "Video saved: $uri")
+                            onFinished(uri)
+                        }
                     }
                 }
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start recording", e)
+            onError(e.message ?: "Failed to start recording")
         }
     }
 
@@ -480,6 +499,7 @@ class InsightCameraController(private val context: Context) {
     ) {
         if (!hasMultipleCameras) return
 
+        val previousLensFacing = lensFacing
         lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
             CameraSelector.LENS_FACING_FRONT
         } else {
@@ -501,7 +521,19 @@ class InsightCameraController(private val context: Context) {
             }
         }
 
-        bindCameraUseCases(lifecycleOwner, previewView)
+        try {
+            bindCameraUseCases(lifecycleOwner, previewView)
+        } catch (e: Exception) {
+            // Revert to previous lens on failure
+            Log.e(TAG, "Switch camera failed, reverting", e)
+            lensFacing = previousLensFacing
+            detectAvailableExtensions()
+            try {
+                bindCameraUseCases(lifecycleOwner, previewView)
+            } catch (e2: Exception) {
+                Log.e(TAG, "Revert also failed", e2)
+            }
+        }
     }
 
     val isBackCamera: Boolean

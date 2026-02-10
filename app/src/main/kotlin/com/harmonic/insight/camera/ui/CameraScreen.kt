@@ -1,10 +1,13 @@
 package com.harmonic.insight.camera.ui
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -86,7 +89,7 @@ fun CameraScreen(modifier: Modifier = Modifier) {
     var lastMediaUri by remember { mutableStateOf<String?>(null) }
     var showZoomIndicator by remember { mutableStateOf(false) }
     var isCapturing by remember { mutableStateOf(false) }
-    var hasMultipleCameras by remember { mutableStateOf(true) }
+    var hasMultipleCameras by remember { mutableStateOf(false) }
     var extensionLabel by remember { mutableStateOf("") }
     var hasExtensions by remember { mutableStateOf(false) }
 
@@ -398,11 +401,15 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                         .then(
                             if (lastMediaUri != null) {
                                 Modifier.clickable {
-                                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                                        setDataAndType(Uri.parse(lastMediaUri), "image/*")
-                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                                            setDataAndType(Uri.parse(lastMediaUri), "image/*")
+                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        }
+                                        context.startActivity(intent)
+                                    } catch (_: Exception) {
+                                        Toast.makeText(context, "No app to open media", Toast.LENGTH_SHORT).show()
                                     }
-                                    context.startActivity(intent)
                                 }
                             } else {
                                 Modifier
@@ -458,8 +465,11 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                                 cameraController.stopVideoRecording()
                                 isVideoRecording = false
                             } else {
+                                val hasAudioPermission = ContextCompat.checkSelfPermission(
+                                    context, Manifest.permission.RECORD_AUDIO,
+                                ) == PackageManager.PERMISSION_GRANTED
                                 cameraController.startVideoRecording(
-                                    withAudio = true,
+                                    withAudio = hasAudioPermission,
                                     onStarted = {
                                         isVideoRecording = true
                                     },
