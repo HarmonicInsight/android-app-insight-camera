@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="insight_black">#FF0A0A0A</color>
+    <color name="insight_white">#FFFAFAFA</color>
+    <color name="insight_accent">#FF3D7BF7</color>
+</resources>
