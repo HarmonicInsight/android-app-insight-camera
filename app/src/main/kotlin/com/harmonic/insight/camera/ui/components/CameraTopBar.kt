@@ -20,15 +20,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.harmonic.insight.camera.camera.CaptureMode
 import com.harmonic.insight.camera.camera.FlashMode
+import com.harmonic.insight.camera.camera.InsightAspectRatio
 import com.harmonic.insight.camera.ui.theme.InsightWhite
 
 @Composable
 fun CameraTopBar(
     flashMode: FlashMode,
     onCycleFlash: () -> Unit,
+    timerDuration: TimerDuration,
+    onCycleTimer: () -> Unit,
+    aspectRatio: InsightAspectRatio,
+    onToggleAspectRatio: () -> Unit,
     onSwitchCamera: () -> Unit,
-    isBackCamera: Boolean,
+    captureMode: CaptureMode,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -43,17 +49,33 @@ fun CameraTopBar(
                 ),
             )
             .statusBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Flash control
-            FlashModeButton(
-                flashMode = flashMode,
-                onCycleFlash = onCycleFlash,
+            // Flash control (photo mode only)
+            if (captureMode == CaptureMode.PHOTO) {
+                FlashModeButton(
+                    flashMode = flashMode,
+                    onCycleFlash = onCycleFlash,
+                )
+            }
+
+            // Timer (photo mode only)
+            if (captureMode == CaptureMode.PHOTO) {
+                TimerButton(
+                    timerDuration = timerDuration,
+                    onCycleTimer = onCycleTimer,
+                )
+            }
+
+            // Aspect ratio
+            AspectRatioButton(
+                aspectRatio = aspectRatio,
+                onToggle = onToggleAspectRatio,
             )
 
             // Camera switch

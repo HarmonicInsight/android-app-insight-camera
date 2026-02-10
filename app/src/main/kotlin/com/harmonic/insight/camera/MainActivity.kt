@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.harmonic.insight.camera.ui.CameraScreen
 import com.harmonic.insight.camera.ui.theme.InsightAccent
@@ -56,14 +56,26 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 private fun CameraPermissionGate() {
-    val cameraPermission = rememberPermissionState(Manifest.permission.CAMERA)
+    val permissionsState = rememberMultiplePermissionsState(
+        listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO,
+        ),
+    )
 
-    if (cameraPermission.status.isGranted) {
+    val cameraGranted = permissionsState.permissions
+        .first { it.permission == Manifest.permission.CAMERA }
+        .status.isGranted
+
+    if (cameraGranted) {
         CameraScreen()
     } else {
+        val shouldShowRationale = permissionsState.permissions
+            .first { it.permission == Manifest.permission.CAMERA }
+            .status.shouldShowRationale
         PermissionRequest(
-            shouldShowRationale = cameraPermission.status.shouldShowRationale,
-            onRequestPermission = { cameraPermission.launchPermissionRequest() },
+            shouldShowRationale = shouldShowRationale,
+            onRequestPermission = { permissionsState.launchMultiplePermissionRequest() },
         )
     }
 }
