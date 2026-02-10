@@ -35,6 +35,9 @@ fun CameraTopBar(
     onToggleAspectRatio: () -> Unit,
     onSwitchCamera: () -> Unit,
     captureMode: CaptureMode,
+    hasMultipleCameras: Boolean,
+    extensionLabel: String,
+    hasExtensions: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -78,21 +81,23 @@ fun CameraTopBar(
                 onToggle = onToggleAspectRatio,
             )
 
-            // Camera switch
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.15f))
-                    .clickable { onSwitchCamera() },
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Cameraswitch,
-                    contentDescription = "Switch Camera",
-                    tint = InsightWhite,
-                    modifier = Modifier.size(24.dp),
-                )
+            // Camera switch (only if device has multiple cameras)
+            if (hasMultipleCameras) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.15f))
+                        .clickable { onSwitchCamera() },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Cameraswitch,
+                        contentDescription = "Switch Camera",
+                        tint = InsightWhite,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
             }
         }
     }

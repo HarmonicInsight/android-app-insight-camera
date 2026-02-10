@@ -86,6 +86,9 @@ fun CameraScreen(modifier: Modifier = Modifier) {
     var lastMediaUri by remember { mutableStateOf<String?>(null) }
     var showZoomIndicator by remember { mutableStateOf(false) }
     var isCapturing by remember { mutableStateOf(false) }
+    var hasMultipleCameras by remember { mutableStateOf(true) }
+    var extensionLabel by remember { mutableStateOf("") }
+    var hasExtensions by remember { mutableStateOf(false) }
 
     // New feature state
     var captureMode by remember { mutableStateOf(CaptureMode.PHOTO) }
@@ -203,6 +206,9 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                             maxZoom = cameraController.maxZoomRatio
                             minZoom = cameraController.minZoomRatio
                             currentZoom = cameraController.currentZoomRatio
+                            hasMultipleCameras = cameraController.hasMultipleCameras
+                            extensionLabel = cameraController.activeExtensionLabel
+                            hasExtensions = cameraController.hasExtensions
                         },
                     )
                 }
@@ -251,8 +257,13 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                 maxZoom = cameraController.maxZoomRatio
                 minZoom = cameraController.minZoomRatio
                 currentZoom = cameraController.currentZoomRatio
+                extensionLabel = cameraController.activeExtensionLabel
+                hasExtensions = cameraController.hasExtensions
             },
             captureMode = captureMode,
+            hasMultipleCameras = hasMultipleCameras,
+            extensionLabel = extensionLabel,
+            hasExtensions = hasExtensions,
             modifier = Modifier.align(Alignment.TopCenter),
         )
 
@@ -280,6 +291,27 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                     text = formatDuration(recordingDuration),
                     color = InsightWhite,
                     fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+
+        // Extensions badge (shows active OEM processing mode)
+        if (hasExtensions && captureMode == CaptureMode.PHOTO && !isVideoRecording) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(start = 16.dp, top = 100.dp)
+                    .background(
+                        Color.Black.copy(alpha = 0.45f),
+                        RoundedCornerShape(12.dp),
+                    )
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+            ) {
+                Text(
+                    text = extensionLabel,
+                    color = InsightWhite.copy(alpha = 0.7f),
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                 )
             }

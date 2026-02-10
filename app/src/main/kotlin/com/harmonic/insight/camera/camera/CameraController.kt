@@ -13,6 +13,8 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
+import androidx.camera.extensions.ExtensionMode
+import androidx.camera.extensions.ExtensionsManager
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Quality
@@ -49,6 +51,7 @@ class InsightCameraController(private val context: Context) {
 
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
+    private var extensionsManager: ExtensionsManager? = null
     private var imageCapture: ImageCapture? = null
     private var preview: Preview? = null
     private var videoCapture: VideoCapture<Recorder>? = null
@@ -57,6 +60,10 @@ class InsightCameraController(private val context: Context) {
     private var lensFacing = CameraSelector.LENS_FACING_BACK
     private var currentLifecycleOwner: LifecycleOwner? = null
     private var currentPreviewView: PreviewView? = null
+
+    // Extensions state
+    private var activeExtensionMode: Int = ExtensionMode.NONE
+    private var _availableExtensions: List<Int> = emptyList()
 
     var flashMode: FlashMode = FlashMode.OFF
         private set
@@ -81,6 +88,20 @@ class InsightCameraController(private val context: Context) {
     val currentZoomRatio: Float
         get() = camera?.cameraInfo?.zoomState?.value?.zoomRatio ?: 1f
 
+    /** Whether device has both front and back cameras */
+    var hasMultipleCameras: Boolean = false
+        private set
+
+    /** Human-readable name of active extension mode */
+    val activeExtensionLabel: String
+        get() = extensionModeLabel(activeExtensionMode)
+
+    /** Whether any extensions are available on this device */
+    val hasExtensions: Boolean
+        get() = _availableExtensions.any { it != ExtensionMode.NONE }
+
+    // --- Startup ---
+
     fun startCamera(
         lifecycleOwner: LifecycleOwner,
         previewView: PreviewView,
@@ -89,12 +110,28 @@ class InsightCameraController(private val context: Context) {
     ) {
         currentLifecycleOwner = lifecycleOwner
         currentPreviewView = previewView
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
             try {
-                cameraProvider = cameraProviderFuture.get()
-                bindCameraUseCases(lifecycleOwner, previewView)
-                onReady()
+                val provider = cameraProviderFuture.get()
+                cameraProvider = provider
+
+                // Detect available cameras
+                hasMultipleCameras = hasCamera(provider, CameraSelector.LENS_FACING_BACK) &&
+                    hasCamera(provider, CameraSelector.LENS_FACING_FRONT)
+
+                // If the initially requested lens doesn't exist, fall back
+                if (!hasCamera(provider, lensFacing)) {
+                    lensFacing = if (hasCamera(provider, CameraSelector.LENS_FACING_BACK)) {
+                        CameraSelector.LENS_FACING_BACK
+                    } else {
+                        CameraSelector.LENS_FACING_FRONT
+                    }
+                }
+
+                // Initialize extensions
+                initExtensions(lifecycleOwner, previewView, onReady, onError)
             } catch (e: Exception) {
                 Log.e(TAG, "Camera initialization failed", e)
                 onError(e)
@@ -102,15 +139,106 @@ class InsightCameraController(private val context: Context) {
         }, ContextCompat.getMainExecutor(context))
     }
 
+    private fun initExtensions(
+        lifecycleOwner: LifecycleOwner,
+        previewView: PreviewView,
+        onReady: () -> Unit,
+        onError: (Exception) -> Unit,
+    ) {
+        val provider = cameraProvider ?: return
+        val extensionsFuture = ExtensionsManager.getInstanceAsync(context, provider)
+        extensionsFuture.addListener({
+            try {
+                extensionsManager = extensionsFuture.get()
+                detectAvailableExtensions()
+
+                // Try AUTO first, then HDR, then NONE
+                activeExtensionMode = when {
+                    isExtensionAvailable(ExtensionMode.AUTO) -> ExtensionMode.AUTO
+                    isExtensionAvailable(ExtensionMode.HDR) -> ExtensionMode.HDR
+                    else -> ExtensionMode.NONE
+                }
+
+                bindCameraUseCases(lifecycleOwner, previewView)
+                onReady()
+            } catch (e: Exception) {
+                // Extensions not available, proceed without them
+                Log.w(TAG, "Extensions unavailable, using basic mode", e)
+                activeExtensionMode = ExtensionMode.NONE
+                _availableExtensions = listOf(ExtensionMode.NONE)
+                try {
+                    bindCameraUseCases(lifecycleOwner, previewView)
+                    onReady()
+                } catch (e2: Exception) {
+                    Log.e(TAG, "Camera bind failed", e2)
+                    onError(e2)
+                }
+            }
+        }, ContextCompat.getMainExecutor(context))
+    }
+
+    private fun detectAvailableExtensions() {
+        val mgr = extensionsManager ?: return
+        val baseCameraSelector = CameraSelector.Builder()
+            .requireLensFacing(lensFacing)
+            .build()
+
+        val modes = listOf(
+            ExtensionMode.AUTO,
+            ExtensionMode.HDR,
+            ExtensionMode.NIGHT,
+            ExtensionMode.BOKEH,
+            ExtensionMode.FACE_RETOUCH,
+        )
+
+        _availableExtensions = buildList {
+            add(ExtensionMode.NONE) // Always available
+            for (mode in modes) {
+                try {
+                    if (mgr.isExtensionAvailable(baseCameraSelector, mode)) {
+                        add(mode)
+                    }
+                } catch (_: Exception) {
+                    // Skip unavailable modes
+                }
+            }
+        }
+
+        Log.d(TAG, "Available extensions: ${_availableExtensions.map { extensionModeLabel(it) }}")
+    }
+
+    private fun isExtensionAvailable(mode: Int): Boolean =
+        _availableExtensions.contains(mode)
+
+    // --- Binding ---
+
     private fun bindCameraUseCases(
         lifecycleOwner: LifecycleOwner,
         previewView: PreviewView,
     ) {
         val provider = cameraProvider ?: return
 
-        val cameraSelector = CameraSelector.Builder()
+        val baseCameraSelector = CameraSelector.Builder()
             .requireLensFacing(lensFacing)
             .build()
+
+        // Apply extensions to camera selector if available (photo mode only)
+        val cameraSelector = if (captureMode == CaptureMode.PHOTO && activeExtensionMode != ExtensionMode.NONE) {
+            try {
+                val mgr = extensionsManager
+                if (mgr != null && mgr.isExtensionAvailable(baseCameraSelector, activeExtensionMode)) {
+                    mgr.getExtensionEnabledCameraSelector(baseCameraSelector, activeExtensionMode)
+                } else {
+                    baseCameraSelector
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to enable extension mode, falling back", e)
+                activeExtensionMode = ExtensionMode.NONE
+                baseCameraSelector
+            }
+        } else {
+            baseCameraSelector
+        }
 
         preview = Preview.Builder()
             .setTargetAspectRatio(aspectRatio.value)
@@ -130,23 +258,44 @@ class InsightCameraController(private val context: Context) {
 
         provider.unbindAll()
 
-        camera = if (captureMode == CaptureMode.PHOTO) {
-            provider.bindToLifecycle(
-                lifecycleOwner,
-                cameraSelector,
-                preview,
-                imageCapture,
-            )
-        } else {
-            provider.bindToLifecycle(
-                lifecycleOwner,
-                cameraSelector,
-                preview,
-                videoCapture,
-            )
+        camera = try {
+            if (captureMode == CaptureMode.PHOTO) {
+                provider.bindToLifecycle(
+                    lifecycleOwner,
+                    cameraSelector,
+                    preview,
+                    imageCapture,
+                )
+            } else {
+                provider.bindToLifecycle(
+                    lifecycleOwner,
+                    cameraSelector,
+                    preview,
+                    videoCapture,
+                )
+            }
+        } catch (e: Exception) {
+            // Fallback: try binding without extensions
+            Log.w(TAG, "Bind failed, retrying without extensions", e)
+            activeExtensionMode = ExtensionMode.NONE
+            if (captureMode == CaptureMode.PHOTO) {
+                provider.bindToLifecycle(
+                    lifecycleOwner,
+                    baseCameraSelector,
+                    preview,
+                    imageCapture,
+                )
+            } else {
+                provider.bindToLifecycle(
+                    lifecycleOwner,
+                    baseCameraSelector,
+                    preview,
+                    videoCapture,
+                )
+            }
         }
 
-        // Restore light (torch) state after rebind
+        // Restore torch state
         if (lightMode == LightMode.ON) {
             camera?.cameraControl?.enableTorch(true)
         }
@@ -329,6 +478,8 @@ class InsightCameraController(private val context: Context) {
         lifecycleOwner: LifecycleOwner,
         previewView: PreviewView,
     ) {
+        if (!hasMultipleCameras) return
+
         lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) {
             CameraSelector.LENS_FACING_FRONT
         } else {
@@ -339,6 +490,17 @@ class InsightCameraController(private val context: Context) {
         }
         currentLifecycleOwner = lifecycleOwner
         currentPreviewView = previewView
+
+        // Re-detect extensions for the new lens
+        detectAvailableExtensions()
+        if (!isExtensionAvailable(activeExtensionMode)) {
+            activeExtensionMode = if (isExtensionAvailable(ExtensionMode.AUTO)) {
+                ExtensionMode.AUTO
+            } else {
+                ExtensionMode.NONE
+            }
+        }
+
         bindCameraUseCases(lifecycleOwner, previewView)
     }
 
@@ -350,6 +512,18 @@ class InsightCameraController(private val context: Context) {
         cameraProvider?.unbindAll()
     }
 
+    // --- Helpers ---
+
+    private fun hasCamera(provider: ProcessCameraProvider, facing: Int): Boolean {
+        return try {
+            provider.hasCamera(
+                CameraSelector.Builder().requireLensFacing(facing).build(),
+            )
+        } catch (_: Exception) {
+            false
+        }
+    }
+
     private fun mapFlashMode(): Int = when (flashMode) {
         FlashMode.OFF -> ImageCapture.FLASH_MODE_OFF
         FlashMode.ON -> ImageCapture.FLASH_MODE_ON
@@ -358,5 +532,14 @@ class InsightCameraController(private val context: Context) {
 
     companion object {
         private const val TAG = "InsightCamera"
+
+        fun extensionModeLabel(mode: Int): String = when (mode) {
+            ExtensionMode.AUTO -> "AUTO"
+            ExtensionMode.HDR -> "HDR"
+            ExtensionMode.NIGHT -> "NIGHT"
+            ExtensionMode.BOKEH -> "BOKEH"
+            ExtensionMode.FACE_RETOUCH -> "BEAUTY"
+            else -> "STANDARD"
+        }
     }
 }
