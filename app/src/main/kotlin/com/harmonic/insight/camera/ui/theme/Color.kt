@@ -2,21 +2,37 @@ package com.harmonic.insight.camera.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Insight brand palette
-val InsightBlack = Color(0xFF0A0A0A)
-val InsightDarkSurface = Color(0xFF141414)
-val InsightDarkGray = Color(0xFF1E1E1E)
-val InsightMediumGray = Color(0xFF2A2A2A)
-val InsightGray = Color(0xFF8A8A8A)
-val InsightLightGray = Color(0xFFBBBBBB)
-val InsightWhite = Color(0xFFFAFAFA)
+// ============================================================
+// Insight Ivory & Gold カラーシステム（Dark Mode）
+// カメラアプリはダーク専用のため、Dark パレットのみ使用
+// brand/colors.json の darkMode セクションに基づく
+// ============================================================
 
-val InsightAccent = Color(0xFF3D7BF7)
-val InsightAccentLight = Color(0xFF6B9BFF)
-val InsightAccentDark = Color(0xFF2A5CC8)
+// --- Dark Theme (Camera-optimized) ---
+val InsightPrimaryDark = Color(0xFFD4BC6A)            // Accent 400 (Gold)
+val InsightOnPrimaryDark = Color(0xFF6B5518)
+val InsightPrimaryContainerDark = Color(0xFF8C711E)   // Gold Hover
+val InsightOnPrimaryContainerDark = Color(0xFFF0E6C8)
 
-val InsightWarning = Color(0xFFFFB74D)
-val InsightSuccess = Color(0xFF66BB6A)
-val InsightError = Color(0xFFEF5350)
+val InsightSecondaryDark = Color(0xFFF0E6C8)          // Accent 200
+val InsightOnSecondaryDark = Color(0xFF6B5518)
 
+val InsightBackgroundDark = Color(0xFF1C1917)         // Dark Bg Primary
+val InsightOnBackgroundDark = Color(0xFFFAF8F5)       // Ivory
+val InsightSurfaceDark = Color(0xFF292524)            // Dark Card
+val InsightOnSurfaceDark = Color(0xFFFAF8F5)
+val InsightSurfaceVariantDark = Color(0xFF3D3835)     // Dark Hover
+val InsightOnSurfaceVariantDark = Color(0xFFD6D3D1)   // Text Secondary
+
+val InsightErrorDark = Color(0xFFFF6B6B)
+val InsightOnErrorDark = Color(0xFF1C1917)
+val InsightOutlineDark = Color(0xFF3D3835)            // Dark Border
+
+// --- Semantic ---
+val InsightSuccess = Color(0xFF16A34A)
+val InsightWarning = Color(0xFFCA8A04)
+val InsightInfo = Color(0xFF2563EB)
+
+// --- Camera-specific ---
 val FlashYellow = Color(0xFFFFD54F)
+val RecordingRed = Color(0xFFEF5350)

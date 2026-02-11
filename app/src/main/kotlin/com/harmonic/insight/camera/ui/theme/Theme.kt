@@ -4,27 +4,28 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
-private val InsightDarkColorScheme = darkColorScheme(
-    primary = InsightAccent,
-    onPrimary = InsightWhite,
-    primaryContainer = InsightAccentDark,
-    onPrimaryContainer = InsightWhite,
-    secondary = InsightGray,
-    onSecondary = InsightWhite,
-    background = InsightBlack,
-    onBackground = InsightWhite,
-    surface = InsightDarkSurface,
-    onSurface = InsightWhite,
-    surfaceVariant = InsightDarkGray,
-    onSurfaceVariant = InsightLightGray,
-    error = InsightError,
-    onError = InsightWhite,
+private val InsightCameraDarkColorScheme = darkColorScheme(
+    primary = InsightPrimaryDark,
+    onPrimary = InsightOnPrimaryDark,
+    primaryContainer = InsightPrimaryContainerDark,
+    onPrimaryContainer = InsightOnPrimaryContainerDark,
+    secondary = InsightSecondaryDark,
+    onSecondary = InsightOnSecondaryDark,
+    background = InsightBackgroundDark,
+    onBackground = InsightOnBackgroundDark,
+    surface = InsightSurfaceDark,
+    onSurface = InsightOnSurfaceDark,
+    surfaceVariant = InsightSurfaceVariantDark,
+    onSurfaceVariant = InsightOnSurfaceVariantDark,
+    error = InsightErrorDark,
+    onError = InsightOnErrorDark,
+    outline = InsightOutlineDark,
 )
 
 @Composable
 fun InsightCameraTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = InsightDarkColorScheme,
+        colorScheme = InsightCameraDarkColorScheme,
         typography = InsightTypography,
         content = content,
     )

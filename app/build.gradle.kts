@@ -1,7 +1,7 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.harmonic.insight.camera"
-        minSdk = 28
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
@@ -34,7 +34,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // For CI: use debug signing if no release keystore configured
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -55,31 +54,30 @@ android {
 
 dependencies {
     // Core
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
 
     // Compose
-    implementation(platform("androidx.compose:compose-bom:2024.12.01"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.tooling)
 
     // CameraX
-    val cameraVersion = "1.4.1"
-    implementation("androidx.camera:camera-core:$cameraVersion")
-    implementation("androidx.camera:camera-camera2:$cameraVersion")
-    implementation("androidx.camera:camera-lifecycle:$cameraVersion")
-    implementation("androidx.camera:camera-view:$cameraVersion")
-    implementation("androidx.camera:camera-video:$cameraVersion")
-    implementation("androidx.camera:camera-extensions:$cameraVersion")
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.camera.video)
+    implementation(libs.androidx.camera.extensions)
 
     // Accompanist - Permissions
-    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
+    implementation(libs.accompanist.permissions)
 
-    // Coil for image loading (gallery thumbnail)
-    implementation("io.coil-kt:coil-compose:2.7.0")
+    // Coil for image loading
+    implementation(libs.coil.compose)
 }
