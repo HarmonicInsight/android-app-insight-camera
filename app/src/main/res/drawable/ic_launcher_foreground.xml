@@ -5,152 +5,49 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Light rays (flashlight beam) -->
+    <!-- Gold circle background -->
     <path
-        android:pathData="M54,32 L54,23"
-        android:strokeColor="#FFD54F"
-        android:strokeWidth="2.8"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000" />
-    <path
-        android:pathData="M47,34 L41,25"
-        android:strokeColor="#FFD54F"
-        android:strokeWidth="2.2"
-        android:strokeLineCap="round"
-        android:strokeAlpha="0.8"
-        android:fillColor="#00000000" />
-    <path
-        android:pathData="M61,34 L67,25"
-        android:strokeColor="#FFD54F"
-        android:strokeWidth="2.2"
-        android:strokeLineCap="round"
-        android:strokeAlpha="0.8"
-        android:fillColor="#00000000" />
-    <!-- Outer short rays -->
-    <path
-        android:pathData="M41,37.5 L36,31"
-        android:strokeColor="#FFD54F"
-        android:strokeWidth="1.5"
-        android:strokeLineCap="round"
-        android:strokeAlpha="0.45"
-        android:fillColor="#00000000" />
-    <path
-        android:pathData="M67,37.5 L72,31"
-        android:strokeColor="#FFD54F"
-        android:strokeWidth="1.5"
-        android:strokeLineCap="round"
-        android:strokeAlpha="0.45"
-        android:fillColor="#00000000" />
+        android:fillColor="#B8942F"
+        android:pathData="M54,54m-34,0a34,34 0,1 1,68 0a34,34 0,1 1,-68 0" />
 
-    <!-- Outer lens ring -->
+    <!-- Viewfinder bump on top of camera body -->
     <path
-        android:pathData="M32,54 a22,22,0,1,0,44,0 a22,22,0,1,0,-44,0"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="3"
-        android:fillColor="#00000000" />
-
-    <!-- Lens glass (subtle fill) -->
-    <path
-        android:pathData="M37,54 a17,17,0,1,0,34,0 a17,17,0,1,0,-34,0"
         android:fillColor="#FFFFFF"
-        android:fillAlpha="0.12" />
+        android:pathData="M43,42 L49,42 L51,46 L41,46 Z" />
 
-    <!-- Mid detail ring -->
+    <!-- Camera body (rounded rectangle) -->
     <path
-        android:pathData="M41,54 a13,13,0,1,0,26,0 a13,13,0,1,0,-26,0"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.2"
-        android:strokeAlpha="0.6"
-        android:fillColor="#00000000" />
-
-    <!-- Aperture blade lines (subtle) -->
-    <group
-        android:pivotX="54"
-        android:pivotY="54">
-        <path
-            android:pathData="M54,41 L54,37"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="0.8"
-            android:strokeAlpha="0.3"
-            android:strokeLineCap="round"
-            android:fillColor="#00000000" />
-    </group>
-    <group
-        android:pivotX="54"
-        android:pivotY="54"
-        android:rotation="60">
-        <path
-            android:pathData="M54,41 L54,37"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="0.8"
-            android:strokeAlpha="0.3"
-            android:strokeLineCap="round"
-            android:fillColor="#00000000" />
-    </group>
-    <group
-        android:pivotX="54"
-        android:pivotY="54"
-        android:rotation="120">
-        <path
-            android:pathData="M54,41 L54,37"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="0.8"
-            android:strokeAlpha="0.3"
-            android:strokeLineCap="round"
-            android:fillColor="#00000000" />
-    </group>
-    <group
-        android:pivotX="54"
-        android:pivotY="54"
-        android:rotation="180">
-        <path
-            android:pathData="M54,41 L54,37"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="0.8"
-            android:strokeAlpha="0.3"
-            android:strokeLineCap="round"
-            android:fillColor="#00000000" />
-    </group>
-    <group
-        android:pivotX="54"
-        android:pivotY="54"
-        android:rotation="240">
-        <path
-            android:pathData="M54,41 L54,37"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="0.8"
-            android:strokeAlpha="0.3"
-            android:strokeLineCap="round"
-            android:fillColor="#00000000" />
-    </group>
-    <group
-        android:pivotX="54"
-        android:pivotY="54"
-        android:rotation="300">
-        <path
-            android:pathData="M54,41 L54,37"
-            android:strokeColor="#FFFFFF"
-            android:strokeWidth="0.8"
-            android:strokeAlpha="0.3"
-            android:strokeLineCap="round"
-            android:fillColor="#00000000" />
-    </group>
-
-    <!-- Core lens element -->
-    <path
-        android:pathData="M47,54 a7,7,0,1,0,14,0 a7,7,0,1,0,-14,0"
         android:fillColor="#FFFFFF"
-        android:fillAlpha="0.85" />
+        android:pathData="M37,46 Q35,46 35,48 L35,66 Q35,68 37,68 L71,68 Q73,68 73,66 L73,48 Q73,46 71,46 Z" />
 
-    <!-- Center point -->
+    <!-- Outer lens circle (gold on white body) -->
     <path
-        android:pathData="M51.5,54 a2.5,2.5,0,1,0,5,0 a2.5,2.5,0,1,0,-5,0"
-        android:fillColor="#FFFFFF" />
+        android:fillColor="#B8942F"
+        android:pathData="M54,57m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0" />
 
-    <!-- Glass reflection highlight -->
+    <!-- Mid lens ring (white) -->
     <path
-        android:pathData="M45,46 a3.5,2.5,325,1,0,5,-2 a3.5,2.5,325,1,0,-5,2"
         android:fillColor="#FFFFFF"
-        android:fillAlpha="0.35" />
+        android:pathData="M54,57m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
+
+    <!-- Inner lens (gold) -->
+    <path
+        android:fillColor="#B8942F"
+        android:pathData="M54,57m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+
+    <!-- Lens highlight (cute reflection dot) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,53.5m-1.5,0a1.5,1.5 0,1 1,3 0a1.5,1.5 0,1 1,-3 0" />
+
+    <!-- Flash circle on top-right of body -->
+    <path
+        android:fillColor="#D4BC6A"
+        android:pathData="M66,50m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0" />
+
+    <!-- Sparkle accent (4-pointed star) at top-right -->
+    <path
+        android:fillColor="#D4BC6A"
+        android:pathData="M76,30 L77.5,26 L79,30 L83,31.5 L79,33 L77.5,37 L76,33 L72,31.5 Z" />
 
 </vector>
