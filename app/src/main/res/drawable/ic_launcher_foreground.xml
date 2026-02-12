@@ -5,49 +5,40 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Gold circle background -->
     <path
         android:fillColor="#B8942F"
-        android:pathData="M54,54m-34,0a34,34 0,1 1,68 0a34,34 0,1 1,-68 0" />
+        android:pathData="M54.0,54.0m-34.0,0a34.0,34.0 0,1 1,68.0,0a34.0,34.0 0,1 1,-68.0,0" />
 
-    <!-- Viewfinder bump on top of camera body -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M43,42 L49,42 L51,46 L41,46 Z" />
-
-    <!-- Camera body (rounded rectangle) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M37,46 Q35,46 35,48 L35,66 Q35,68 37,68 L71,68 Q73,68 73,66 L73,48 Q73,46 71,46 Z" />
-
-    <!-- Outer lens circle (gold on white body) -->
-    <path
-        android:fillColor="#B8942F"
-        android:pathData="M54,57m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0" />
-
-    <!-- Mid lens ring (white) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,57m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
-
-    <!-- Inner lens (gold) -->
-    <path
-        android:fillColor="#B8942F"
-        android:pathData="M54,57m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
-
-    <!-- Lens highlight (cute reflection dot) -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M50,53.5m-1.5,0a1.5,1.5 0,1 1,3 0a1.5,1.5 0,1 1,-3 0" />
-
-    <!-- Flash circle on top-right of body -->
-    <path
-        android:fillColor="#D4BC6A"
-        android:pathData="M66,50m-2.5,0a2.5,2.5 0,1 1,5 0a2.5,2.5 0,1 1,-5 0" />
-
-    <!-- Sparkle accent (4-pointed star) at top-right -->
     <path
         android:fillColor="#D4BC6A"
         android:pathData="M76,30 L77.5,26 L79,30 L83,31.5 L79,33 L77.5,37 L76,33 L72,31.5 Z" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,46 L48,40 L56,40 L60,46" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38.0,46.0 L70.0,46.0 Q73.0,46.0 73.0,49.0 L73.0,65.0 Q73.0,68.0 70.0,68.0 L38.0,68.0 Q35.0,68.0 35.0,65.0 L35.0,49.0 Q35.0,46.0 38.0,46.0 Z" />
+
+    <path
+        android:fillColor="#B8942F"
+        android:pathData="M54.0,57.0m-10.0,0a10.0,10.0 0,1 1,20.0,0a10.0,10.0 0,1 1,-20.0,0" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54.0,57.0m-7.0,0a7.0,7.0 0,1 1,14.0,0a7.0,7.0 0,1 1,-14.0,0" />
+
+    <path
+        android:fillColor="#B8942F"
+        android:pathData="M54.0,57.0m-4.0,0a4.0,4.0 0,1 1,8.0,0a4.0,4.0 0,1 1,-8.0,0" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M51.0,54.5m-1.5,0a1.5,1.5 0,1 1,3.0,0a1.5,1.5 0,1 1,-3.0,0" />
+
+    <path
+        android:fillColor="#D4BC6A"
+        android:pathData="M66.0,50.0m-2.5,0a2.5,2.5 0,1 1,5.0,0a2.5,2.5 0,1 1,-5.0,0" />
 
 </vector>
