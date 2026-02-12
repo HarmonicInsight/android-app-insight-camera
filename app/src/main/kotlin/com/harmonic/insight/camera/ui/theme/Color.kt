@@ -33,6 +33,13 @@ val InsightSuccess = Color(0xFF16A34A)
 val InsightWarning = Color(0xFFCA8A04)
 val InsightInfo = Color(0xFF2563EB)
 
+// --- Convenience aliases (used by UI components) ---
+val InsightAccent = InsightPrimaryDark           // Gold accent (#D4BC6A)
+val InsightBlack = InsightBackgroundDark          // Dark background (#1C1917)
+val InsightWhite = InsightOnBackgroundDark        // Ivory text/icons (#FAF8F5)
+val InsightGray = InsightOnSurfaceVariantDark     // Secondary text (#D6D3D1)
+val InsightError = InsightErrorDark               // Error red (#FF6B6B)
+
 // --- Camera-specific ---
 val FlashYellow = Color(0xFFFFD54F)
 val RecordingRed = Color(0xFFEF5350)
