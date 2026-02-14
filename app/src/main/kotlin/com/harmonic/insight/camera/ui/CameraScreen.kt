@@ -1,6 +1,7 @@
 package com.harmonic.insight.camera.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -44,12 +45,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.rememberAsyncImagePainter
+import com.harmonic.insight.camera.R
 import com.harmonic.insight.camera.camera.CaptureMode
 import com.harmonic.insight.camera.camera.FlashMode
 import com.harmonic.insight.camera.camera.InsightAspectRatio
@@ -103,6 +106,8 @@ fun CameraScreen(modifier: Modifier = Modifier) {
     var focusId by remember { mutableLongStateOf(0L) }
     var isVideoRecording by remember { mutableStateOf(false) }
     var recordingDuration by remember { mutableIntStateOf(0) }
+    // Track MIME type for the last captured media
+    var lastMediaIsVideo by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -124,10 +129,11 @@ fun CameraScreen(modifier: Modifier = Modifier) {
             cameraController.takePhoto(
                 onSuccess = { uri ->
                     lastMediaUri = uri
+                    lastMediaIsVideo = false
                     isCapturing = false
                 },
                 onError = {
-                    Toast.makeText(context, "Failed to capture", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.capture_failed), Toast.LENGTH_SHORT).show()
                     isCapturing = false
                 },
             )
@@ -153,7 +159,8 @@ fun CameraScreen(modifier: Modifier = Modifier) {
         // Camera preview with touch handling
         AndroidView(
             factory = { ctx ->
-                PreviewView(ctx).apply {
+                @SuppressLint("ClickableViewAccessibility")
+                fun createPreviewView(): PreviewView = PreviewView(ctx).apply {
                     implementationMode = PreviewView.ImplementationMode.PERFORMANCE
                     scaleType = PreviewView.ScaleType.FILL_CENTER
 
@@ -193,6 +200,7 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                                     )
                                     focusId++
                                     focusPoint = FocusPoint(x, y, focusId)
+                                    view.performClick()
                                 }
                             }
                         }
@@ -215,6 +223,7 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                         },
                     )
                 }
+                createPreviewView()
             },
             modifier = Modifier.fillMaxSize(),
         )
@@ -402,13 +411,14 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                             if (lastMediaUri != null) {
                                 Modifier.clickable {
                                     try {
+                                        val mimeType = if (lastMediaIsVideo) "video/*" else "image/*"
                                         val intent = Intent(Intent.ACTION_VIEW).apply {
-                                            setDataAndType(Uri.parse(lastMediaUri), "image/*")
+                                            setDataAndType(Uri.parse(lastMediaUri), mimeType)
                                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                         }
                                         context.startActivity(intent)
                                     } catch (_: Exception) {
-                                        Toast.makeText(context, "No app to open media", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, context.getString(R.string.no_app_to_open_media), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             } else {
@@ -419,7 +429,7 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                     if (lastMediaUri != null) {
                         Image(
                             painter = rememberAsyncImagePainter(lastMediaUri),
-                            contentDescription = "Last media",
+                            contentDescription = stringResource(R.string.last_media),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxSize()
@@ -442,12 +452,13 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                                 cameraController.takePhoto(
                                     onSuccess = { uri ->
                                         lastMediaUri = uri
+                                        lastMediaIsVideo = false
                                         isCapturing = false
                                     },
                                     onError = {
                                         Toast.makeText(
                                             context,
-                                            "Failed to capture",
+                                            context.getString(R.string.capture_failed),
                                             Toast.LENGTH_SHORT,
                                         ).show()
                                         isCapturing = false
@@ -475,12 +486,13 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                                     },
                                     onFinished = { uri ->
                                         lastMediaUri = uri
+                                        lastMediaIsVideo = true
                                         isVideoRecording = false
                                     },
                                     onError = { msg ->
                                         Toast.makeText(
                                             context,
-                                            "Recording failed: $msg",
+                                            context.getString(R.string.recording_failed, msg),
                                             Toast.LENGTH_SHORT,
                                         ).show()
                                         isVideoRecording = false

@@ -19,7 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.harmonic.insight.camera.R
 import com.harmonic.insight.camera.camera.CaptureMode
 import com.harmonic.insight.camera.camera.FlashMode
 import com.harmonic.insight.camera.camera.InsightAspectRatio
@@ -93,7 +95,7 @@ fun CameraTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Cameraswitch,
-                        contentDescription = "Switch Camera",
+                        contentDescription = stringResource(R.string.switch_camera),
                         tint = InsightWhite,
                         modifier = Modifier.size(24.dp),
                     )

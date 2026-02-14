@@ -11,9 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.harmonic.insight.camera.R
 import com.harmonic.insight.camera.camera.CaptureMode
 import com.harmonic.insight.camera.ui.theme.InsightAccent
 import com.harmonic.insight.camera.ui.theme.InsightWhite
@@ -30,12 +32,12 @@ fun ModeSelector(
         modifier = modifier,
     ) {
         ModeTab(
-            label = "PHOTO",
+            label = stringResource(R.string.mode_photo),
             isSelected = currentMode == CaptureMode.PHOTO,
             onClick = { onModeChanged(CaptureMode.PHOTO) },
         )
         ModeTab(
-            label = "VIDEO",
+            label = stringResource(R.string.mode_video),
             isSelected = currentMode == CaptureMode.VIDEO,
             onClick = { onModeChanged(CaptureMode.VIDEO) },
         )

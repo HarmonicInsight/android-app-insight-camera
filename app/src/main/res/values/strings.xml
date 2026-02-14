@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Insight Camera</string>
+
+    <!-- Permission screen -->
+    <string name="permission_rationale">Camera permission is required to take photos. Please grant access to continue.</string>
+    <string name="permission_initial">To get started, allow Insight Camera to access your camera.</string>
+    <string name="allow_camera_access">Allow Camera Access</string>
+
+    <!-- Camera controls -->
+    <string name="flash_off">OFF</string>
+    <string name="flash_on">ON</string>
+    <string name="flash_auto">AUTO</string>
+    <string name="light_on">LIGHT ON</string>
+    <string name="light_off">LIGHT</string>
+    <string name="switch_camera">Switch Camera</string>
+
+    <!-- Mode selector -->
+    <string name="mode_photo">PHOTO</string>
+    <string name="mode_video">VIDEO</string>
+
+    <!-- Media -->
+    <string name="last_media">Last media</string>
+    <string name="no_app_to_open_media">No app to open media</string>
+
+    <!-- Errors -->
+    <string name="capture_failed">Failed to capture</string>
+    <string name="recording_failed">Recording failed: %1$s</string>
 </resources>

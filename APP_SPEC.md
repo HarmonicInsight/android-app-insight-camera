@@ -165,7 +165,7 @@ app/src/main/
 │   │   ├── strings.xml
 │   │   └── themes.xml
 │   └── xml/
-│       └── file_paths.xml
+│       └── data_extraction_rules.xml
 ```
 
 ---
@@ -216,15 +216,17 @@ Camera Switch
 
 ## Design Language
 
-### Color Palette
+### Color Palette (Ivory & Gold)
 
 | Name | Hex | Usage |
 |------|-----|-------|
-| InsightBlack | `#0A0A0A` | Background |
-| InsightAccent | `#3D7BF7` | Primary actions, focus ring, selected state |
-| InsightWhite | `#FAFAFA` | Text, icons |
+| InsightBlack | `#1C1917` | Dark background |
+| InsightAccent | `#D4BC6A` | Gold accent, primary actions, focus ring, selected state |
+| InsightWhite | `#FAF8F5` | Ivory text, icons |
+| InsightGray | `#D6D3D1` | Secondary text |
 | FlashYellow | `#FFD54F` | Light ON indicator |
-| InsightError | `#EF5350` | Recording dot |
+| InsightError | `#FF6B6B` | Error state |
+| RecordingRed | `#EF5350` | Recording dot |
 
 ### Design Principles
 
@@ -243,9 +245,9 @@ Camera Switch
 |---------|-----|--------|
 | Push to `main`, `claude/**` | `build` | Debug APK (30-day retention) |
 | PR to `main` | `build` | Debug APK (30-day retention) |
-| Push to `main` | `release` | Release APK (90-day retention) |
+| Push to `main` | `release` | Release AAB + APK + ProGuard mapping (90-day retention) |
 
-Pipeline: Checkout → JDK 17 → Android SDK → Gradle Cache → Build → Upload Artifact
+Pipeline: Checkout → JDK 17 → Android SDK → Gradle Cache → Keystore Decode → Build AAB/APK → Upload Artifacts
 
 ---
 
