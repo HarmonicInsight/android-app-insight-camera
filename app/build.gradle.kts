@@ -22,7 +22,7 @@ android {
         }
         create("release") {
             val keystorePath = System.getenv("KEYSTORE_PATH")
-            if (keystorePath != null) {
+            if (keystorePath != null && file(keystorePath).exists()) {
                 storeFile = file(keystorePath)
                 storePassword = System.getenv("KEYSTORE_PASSWORD")
                 keyAlias = System.getenv("KEY_ALIAS")
@@ -63,6 +63,16 @@ android {
 
     buildFeatures {
         compose = true
+    }
+
+    packaging {
+        jniLibs {
+            keepDebugSymbols += setOf(
+                "lib/*/libandroidx.graphics.path.so",
+                "lib/*/libimage_processing_util_jni.so",
+                "lib/*/libsurface_util_jni.so",
+            )
+        }
     }
 }
 
