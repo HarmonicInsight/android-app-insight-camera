@@ -2,6 +2,7 @@ package com.harmonic.insight.camera.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -28,7 +29,11 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +52,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -108,6 +114,7 @@ fun CameraScreen(modifier: Modifier = Modifier) {
     var recordingDuration by remember { mutableIntStateOf(0) }
     // Track MIME type for the last captured media
     var lastMediaIsVideo by remember { mutableStateOf(false) }
+    var showAppInfoDialog by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -149,6 +156,10 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                 recordingDuration++
             }
         }
+    }
+
+    if (showAppInfoDialog) {
+        AppInfoDialog(onDismiss = { showAppInfoDialog = false })
     }
 
     Box(
@@ -261,6 +272,7 @@ fun CameraScreen(modifier: Modifier = Modifier) {
                 }
                 cameraController.setAspectRatio(aspectRatio)
             },
+            onInfoClick = { showAppInfoDialog = true },
             onSwitchCamera = {
                 val pv = previewView ?: return@CameraTopBar
                 cameraController.switchCamera(lifecycleOwner, pv)
@@ -520,4 +532,96 @@ private fun formatDuration(seconds: Int): String {
     val m = seconds / 60
     val s = seconds % 60
     return "%d:%02d".format(m, s)
+}
+
+@Composable
+private fun AppInfoDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val versionName = remember {
+        try {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.0.0"
+        } catch (_: Exception) { "1.0.0" }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.settings_about)) },
+        text = {
+            Column {
+                // Version
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(stringResource(R.string.settings_version), style = MaterialTheme.typography.bodyMedium)
+                    Text(versionName, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Developer
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(stringResource(R.string.settings_developer), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.settings_developer_name), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Legal
+                Text(
+                    text = stringResource(R.string.settings_legal),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                TextButton(onClick = {
+                    safeOpenUrl(context, context.getString(R.string.url_privacy_policy))
+                }) {
+                    Text(stringResource(R.string.settings_privacy_policy))
+                }
+                TextButton(onClick = {
+                    safeOpenUrl(context, context.getString(R.string.url_terms_of_service))
+                }) {
+                    Text(stringResource(R.string.settings_terms_of_service))
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Copyright
+                Text(
+                    text = stringResource(
+                        R.string.settings_copyright,
+                        java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.close))
+            }
+        }
+    )
+}
+
+private fun safeOpenUrl(context: android.content.Context, url: String) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    } catch (_: ActivityNotFoundException) {
+        Toast.makeText(context, context.getString(R.string.settings_url_open_error), Toast.LENGTH_SHORT).show()
+    } catch (_: Exception) {
+        // Ignore
+    }
 }

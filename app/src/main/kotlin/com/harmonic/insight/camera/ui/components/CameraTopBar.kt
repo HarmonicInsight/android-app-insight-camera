@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cameraswitch
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,6 +37,7 @@ fun CameraTopBar(
     aspectRatio: InsightAspectRatio,
     onToggleAspectRatio: () -> Unit,
     onSwitchCamera: () -> Unit,
+    onInfoClick: () -> Unit,
     captureMode: CaptureMode,
     hasMultipleCameras: Boolean,
     extensionLabel: String,
@@ -100,6 +102,23 @@ fun CameraTopBar(
                         modifier = Modifier.size(24.dp),
                     )
                 }
+            }
+
+            // App info
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.15f))
+                    .clickable { onInfoClick() },
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Info,
+                    contentDescription = stringResource(R.string.settings_about),
+                    tint = InsightWhite,
+                    modifier = Modifier.size(24.dp),
+                )
             }
         }
     }
