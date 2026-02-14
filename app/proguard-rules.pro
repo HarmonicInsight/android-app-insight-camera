@@ -1,11 +1,11 @@
-# CameraX - keep extension mode detection via reflection
--keep class androidx.camera.** { *; }
+# CameraX Extensions - keep extension mode detection via reflection
+# (core/camera2/lifecycle/view/video は AAR の consumer rules で処理される)
+-keep class androidx.camera.extensions.** { *; }
 
 # Compose
 -dontwarn androidx.compose.**
 
-# Coil - keep image decoder implementations
--keep class coil.** { *; }
+# Coil - AAR の consumer rules で処理される
 -dontwarn coil.**
 
 # Accompanist
