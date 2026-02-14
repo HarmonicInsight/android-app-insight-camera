@@ -38,6 +38,34 @@ jobs:
       - name: Create Gradle wrapper
         run: gradle wrapper --gradle-version 8.9
 
+      - name: Verify launcher icons use master PNGs
+        run: |
+          echo "Checking adaptive icon XMLs reference @mipmap PNG foregrounds..."
+          for xml in app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml \
+                     app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml; do
+            if grep -q '@drawable/.*foreground' "$xml"; then
+              echo "ERROR: $xml references a drawable vector foreground instead of @mipmap PNG."
+              echo "The master icons are the PNGs in mipmap-* directories."
+              echo "Foreground must reference @mipmap/, not @drawable/."
+              exit 1
+            fi
+            if ! grep -q '@mipmap/.*foreground' "$xml"; then
+              echo "ERROR: $xml does not reference a @mipmap PNG foreground."
+              exit 1
+            fi
+          done
+          echo "Checking foreground PNGs exist in all densities..."
+          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            for f in ic_launcher_foreground.png ic_launcher_round_foreground.png; do
+              path="app/src/main/res/mipmap-${density}/${f}"
+              if [ ! -f "$path" ]; then
+                echo "ERROR: Missing $path"
+                exit 1
+              fi
+            done
+          done
+          echo "All icon checks passed."
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
