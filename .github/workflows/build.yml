@@ -79,6 +79,7 @@ jobs:
         run: gradle wrapper --gradle-version 8.9
 
       - name: Decode keystore
+        id: decode_keystore
         if: env.KEYSTORE_BASE64 != ''
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -86,7 +87,7 @@ jobs:
 
       - name: Build Release AAB
         env:
-          KEYSTORE_PATH: ${{ github.workspace }}/release.keystore
+          KEYSTORE_PATH: ${{ steps.decode_keystore.outcome == 'success' && format('{0}/release.keystore', github.workspace) || '' }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -94,7 +95,7 @@ jobs:
 
       - name: Build Release APK
         env:
-          KEYSTORE_PATH: ${{ github.workspace }}/release.keystore
+          KEYSTORE_PATH: ${{ steps.decode_keystore.outcome == 'success' && format('{0}/release.keystore', github.workspace) || '' }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
