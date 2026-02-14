@@ -12,6 +12,8 @@ local.properties
 /app/release
 *.apk
 *.aab
+*.jks
+*.keystore
 
 # icon sync hash
 app/src/main/res/.icon-sync-hash

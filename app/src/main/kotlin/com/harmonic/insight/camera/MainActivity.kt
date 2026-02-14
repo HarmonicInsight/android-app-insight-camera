@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -106,7 +107,7 @@ private fun PermissionRequest(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Insight Camera",
+                text = stringResource(R.string.app_name),
                 color = InsightWhite,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -116,9 +117,9 @@ private fun PermissionRequest(
 
             Text(
                 text = if (shouldShowRationale) {
-                    "Camera permission is required to take photos. Please grant access to continue."
+                    stringResource(R.string.permission_rationale)
                 } else {
-                    "To get started, allow Insight Camera to access your camera."
+                    stringResource(R.string.permission_initial)
                 },
                 color = InsightGray,
                 fontSize = 15.sp,
@@ -137,7 +138,7 @@ private fun PermissionRequest(
                 shape = RoundedCornerShape(12.dp),
             ) {
                 Text(
-                    text = "Allow Camera Access",
+                    text = stringResource(R.string.allow_camera_access),
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 )

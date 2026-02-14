@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Insight Camera</string>
+
+    <!-- Permission screen -->
+    <string name="permission_rationale">写真を撮るにはカメラの許可が必要です。アクセスを許可してください。</string>
+    <string name="permission_initial">Insight Camera を使い始めるには、カメラへのアクセスを許可してください。</string>
+    <string name="allow_camera_access">カメラへのアクセスを許可</string>
+
+    <!-- Camera controls -->
+    <string name="flash_off">OFF</string>
+    <string name="flash_on">ON</string>
+    <string name="flash_auto">AUTO</string>
+    <string name="light_on">ライト ON</string>
+    <string name="light_off">ライト</string>
+    <string name="switch_camera">カメラ切替</string>
+
+    <!-- Mode selector -->
+    <string name="mode_photo">写真</string>
+    <string name="mode_video">動画</string>
+
+    <!-- Media -->
+    <string name="last_media">最後のメディア</string>
+    <string name="no_app_to_open_media">メディアを開けるアプリがありません</string>
+
+    <!-- Errors -->
+    <string name="capture_failed">撮影に失敗しました</string>
+    <string name="recording_failed">録画に失敗しました: %1$s</string>
+</resources>
